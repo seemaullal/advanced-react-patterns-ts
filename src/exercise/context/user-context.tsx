@@ -51,7 +51,7 @@ function userReducer(
         ...state,
         status: 'rejected',
         error: action.error,
-        user: state.storedUser,
+        user: state.storedUser as User,
         storedUser: null,
       }
     }
@@ -79,7 +79,7 @@ function updateUser(
   updates: any,
 ) {
   dispatch({type: 'start update', updates})
-  userClient.updateUser(user, updates).then(
+  return userClient.updateUser(user, updates).then(
     updatedUser => dispatch({type: 'finish update', updatedUser}),
     error => dispatch({type: 'fail update', error}),
   )
