@@ -11,9 +11,16 @@ import * as React from 'react'
 // this is here to fill in for the onChange handler
 // we're not using onChange because it seems to behave
 // differently in codesandbox and locally :shrug:
+
+interface SwitchProps {
+  on: boolean
+  className?: string
+  'aria-label'?: string
+  onClick: (event: React.MouseEvent<HTMLInputElement, MouseEvent>) => void
+}
 const noop = () => {}
 
-class Switch extends React.Component {
+class Switch extends React.Component<SwitchProps> {
   render() {
     const {
       on,

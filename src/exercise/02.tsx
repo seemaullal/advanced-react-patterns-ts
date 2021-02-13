@@ -4,29 +4,38 @@
 import * as React from 'react'
 import {Switch} from '../switch'
 
-function Toggle() {
+function Toggle({children}: {children: React.ReactNode}) {
   const [on, setOn] = React.useState(false)
   const toggle = () => setOn(!on)
 
-  // 🐨 replace this with a call to React.Children.map and map each child in
-  // props.children to a clone of that child with the props they need using
-  // React.cloneElement.
-  // 💰 React.Children.map(props.children, child => {/* return child clone here */})
-  // 📜 https://reactjs.org/docs/react-api.html#reactchildren
-  // 📜 https://reactjs.org/docs/react-api.html#cloneelement
-  return <Switch on={on} onClick={toggle} />
+  return (
+    <>
+      {React.Children.map(children, (child, index) => {
+        //@ts-expect-errors
+        return React.cloneElement(child, {
+          on,
+          toggle,
+        })
+      })}
+    </>
+  )
 }
 
-// 🐨 Flesh out each of these components
+const ToggleOn: React.FC<{on?: boolean}> = ({on, children}) => {
+  return on ? <>{children}</> : null
+}
 
-// Accepts `on` and `children` props and returns `children` if `on` is true
-const ToggleOn = () => null
+const ToggleOff: React.FC<{on?: boolean}> = ({on, children}) => {
+  return on ? null : <>{children}</>
+}
 
-// Accepts `on` and `children` props and returns `children` if `on` is false
-const ToggleOff = () => null
-
-// Accepts `on` and `toggle` props and returns the <Switch /> with those props.
-const ToggleButton = () => null
+function ToggleButton(
+  props: Partial<React.ComponentProps<typeof Switch>> &
+    Partial<{on: boolean; toggle: () => void}>,
+) {
+  const {on = false, toggle = () => void 0, ...otherProps} = props
+  return <Switch on={on} onClick={toggle || (() => void 0)} {...otherProps} />
+}
 
 function App() {
   return (
@@ -41,8 +50,3 @@ function App() {
 }
 
 export default App
-
-/*
-eslint
-  no-unused-vars: "off",
-*/
