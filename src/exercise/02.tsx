@@ -11,11 +11,15 @@ function Toggle({children}: {children: React.ReactNode}) {
   return (
     <>
       {React.Children.map(children, (child, index) => {
-        //@ts-expect-errors
-        return React.cloneElement(child, {
-          on,
-          toggle,
-        })
+        if (React.isValidElement(child) && typeof child.type !== 'string') {
+          // this will be true for React component children only
+          return React.cloneElement(child, {
+            on,
+            toggle,
+          })
+        } else {
+          return child
+        }
       })}
     </>
   )
@@ -43,6 +47,7 @@ function App() {
       <Toggle>
         <ToggleOn>The button is on</ToggleOn>
         <ToggleOff>The button is off</ToggleOff>
+        <span>Hello</span>
         <ToggleButton />
       </Toggle>
     </div>
