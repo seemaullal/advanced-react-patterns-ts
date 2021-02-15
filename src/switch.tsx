@@ -16,7 +16,7 @@ interface SwitchProps {
   on: boolean
   className?: string
   'aria-label'?: string
-  onClick: (event: React.MouseEvent<HTMLInputElement, MouseEvent>) => void
+  onClick: (event?: React.MouseEvent<HTMLInputElement, MouseEvent>) => void
 }
 const noop = () => {}
 
