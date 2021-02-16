@@ -9,18 +9,23 @@ interface ToggleReducerState {
 }
 
 type ToggleReducerActionType =
-  | {type: 'toggle'}
-  | {type: 'reset'; initialState: ToggleReducerState}
+  | {type: ToggleReducerActions.TOGGLE}
+  | {type: ToggleReducerActions.RESET; initialState: ToggleReducerState}
+
+enum ToggleReducerActions {
+  RESET = 'reset',
+  TOGGLE = 'toggle',
+}
 
 const toggleReducer: React.Reducer<
   ToggleReducerState,
   ToggleReducerActionType
 > = (state, action) => {
   switch (action.type) {
-    case 'toggle': {
+    case ToggleReducerActions.TOGGLE: {
       return {on: !state.on}
     }
-    case 'reset': {
+    case ToggleReducerActions.RESET: {
       return action.initialState
     }
   }
@@ -38,8 +43,8 @@ function useToggle({initialOn = false, reducer = toggleReducer} = {}) {
   const [state, dispatch] = React.useReducer(reducer, initialState)
   const {on} = state
 
-  const toggle = () => dispatch({type: 'toggle'})
-  const reset = () => dispatch({type: 'reset', initialState})
+  const toggle = () => dispatch({type: ToggleReducerActions.TOGGLE})
+  const reset = () => dispatch({type: ToggleReducerActions.RESET, initialState})
 
   function getTogglerProps<
     T extends Partial<React.ComponentProps<typeof Switch>> &
@@ -93,17 +98,10 @@ function App() {
 
   const toggleStateReducer = useCallback(
     (state: ToggleReducerState, action: ToggleReducerActionType) => {
-      switch (action.type) {
-        case 'toggle': {
-          if (clickedTooMuch) {
-            return {on: state.on}
-          }
-          return {on: !state.on}
-        }
-        case 'reset': {
-          return {on: false}
-        }
+      if (action.type === ToggleReducerActions.TOGGLE && clickedTooMuch) {
+        return {on: state.on}
       }
+      return toggleReducer(state, action)
     },
     [clickedTooMuch],
   )
