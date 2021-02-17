@@ -36,7 +36,6 @@ function useControlledSwitchWarning<T>(
   const {current: onWasControlled} = React.useRef(onIsControlled)
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'production') return
     if (onIsControlled && !onWasControlled) {
       console.error(
         `${componentName} is changing from uncontrolled to be controlled. Components should not switch from uncontrolled to controlled (or vice versa). Decide between using a controlled or uncontrolled ${componentName}  for the lifetime of the component. Check the ${controlPropName}  prop.`,
@@ -62,7 +61,6 @@ function useReadOnlyControlledComponentWarning<T>(
 ) {
   const onIsControlled = controlPropValue === null
   useEffect(() => {
-    if (process.env.NODE_ENV === 'production') return
     if (onIsControlled && hasOnChange && !readOnlyProp) {
       console.error(
         `A \`${controlPropName}\` prop was provided to \`${componentName}\` without an \`${onChangeProp}\` handler. This will result in a read-only \`${controlPropName}\` value. If you want it to be mutable, use \`${initialValueProp}\`. Otherwise, set either \`${onChangeProp}\` or \`${readOnlyProp}\`.`,
@@ -114,18 +112,21 @@ function useToggle(
   const [state, dispatch] = React.useReducer(reducer, initialState)
   const onIsControlled = controlledOn !== null
   const on = onIsControlled && controlledOn !== null ? controlledOn : state.on
-
-  useControlledSwitchWarning(controlledOn, 'on', 'useToggle')
-  useReadOnlyControlledComponentWarning(
-    controlledOn,
-    'on',
-    onChange === null,
-    'onChange',
-    readOnly,
-    'readOnly',
-    'useToggle',
-    'initialOn',
-  )
+  if (process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useControlledSwitchWarning(controlledOn, 'on', 'useToggle')
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useReadOnlyControlledComponentWarning(
+      controlledOn,
+      'on',
+      onChange === null,
+      'onChange',
+      readOnly,
+      'readOnly',
+      'useToggle',
+      'initialOn',
+    )
+  }
 
   function dispatchWithOnChange(action: ToggleReducerActionType) {
     if (!onIsControlled) {
